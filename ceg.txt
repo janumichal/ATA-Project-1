@@ -1,0 +1,73 @@
+Causes:
+// l = less, ge = greater or equal, np = neprioritní, p = prioritní
+// Časová pásma
+tl1_np:     Časové pásmo: Vyzvednutí trvá < 1m od přijetí NEprioritního požadavku. (time < 1m)
+tge1_np:    Časové pásmo: Vyzvednutí trvá >= 1m od přijetí NEprioritního požadavku. (time >= 1m)
+tl1_p:      Časové pásmo:  Vyzvednutí trvá < 1m od přijetí prioritního požadavku (time < 1m)
+tge1_p:     Časové pásmo: Vyzvednutí trvá >= 1m od přijetí prioritního požadavku. (time >= 1m)
+
+// akce ve zvoleném pásmu
+vyzvednuti_tl1_np:  Vyzvednutí nákladu v pásmu tl1_np.
+vyzvednuti_tl1_p:   Vyzvednutí nákladu v pásmu tl1_p.
+
+// určení vlastností
+set_np:                 Nastavení NEprioritního požadavku.
+set_p:                  Nastavení priotitního požadavku.
+set_unload_only:        Přepnutí do režimu jenom vykládka
+has_prio_load:          Má prioritní náklad.
+has_empty_slot:         Má alespoň 1 prázdný slot.
+not_loaded_overlimit:   V případě naložení nákladu je vozík přes limit nosnosti.
+
+Effects:
+e_nalozeni_np:          Naložení neprioritního nákladu na vozík.
+e_nalozeni_p:           Naložení prioritního nákladu na vozík.
+e_set_priority_req:     Je nastaven prioritní požadavek.
+e_delreq_infomsg:       Odstranění prio požadavku a odeslání info zprávy o překrožení času
+e_set_unload_only:      Přepnutí do režimu pouze vykládka pokud naloží prioritní náklad
+e_still_unload_only:    Zůstává v režimu pouze vykládka dokud nevyloží veškerý prioritní náklad.
+e_only_to_prio_dest:    Vozík je v režimu pouze vykládka a jede jenom do cíle daným prioritním nákladem.
+
+Rules:
+has_space = has_empty_slot && not_loaded_overlimit
+e_nalozeni_np = vyzvednuti_tl1_np && has_space 
+e_set_priority_req = tge1_np 
+e_nalozeni_p = vyzvednuti_tl1_p && has_space 
+e_delreq_infomsg = tge1_p
+e_set_unload_only = has_prio_load
+e_still_unload_only = has_prio_load && set_unload_only      // musí být před tím v režimu pouze vykládka
+e_only_to_prio_dest = set_unload_only
+
+
+Constraints:
+// Časová souslednost
+// tl1_np > tge1_np > tl1_p > tge1_p
+tge1_np -> tl1_np 
+tl1_p -> tge1_np 
+tge1_p -> tl1_p
+
+// Časová náležitost
+// vyzvednutí z daného časového úseku musí odpovídat danému časovému úseku
+vyzvednuti_tl1_np -> tl1_np
+vyzvednuti_tl1_p -> tl1_p
+set_p -> tge1_np
+
+// Podmínění využití časového pásma
+tge1_np -> set_p                        // můžu nastavit prioritu až po 1m (neprioritního požadavku)
+tl1_np -> set_np                        // mám neprioritní požadavek v prvním úseku do 1m (neprioritního požadavku)
+
+// Logické souvislosti
+set_np -> tl1_np 
+set_p -> tl1_p
+set_unload_only -> vyzvednuti_tl1_p     // pokud je unload only musí být i vyzvednutí prio nákladu
+vyzvednuti_tl1_p -> set_unload_only     // i naopak platí
+has_prio_load -> vyzvednuti_tl1_p
+vyzvednuti_tl1_p -> has_prio_load 
+
+E: vyzvednuti_tl1_np, tge1_np           // nemůže vyzvednout i nevyzvednout zároveň (došlo by k zvýšení prio i když se vyzvedl)
+E: vyzvednuti_tl1_p, tge1_p             // nemůže vyzvednout i nevyzvednout zároveň (vypršení i po vyzvednuti prio nákladu)
+// Obě Exkluze jsou splněny už výše
+//E: has_prio_load,vyzvednuti_tl1_np    // nemůže mít prio náklad pokud ho vyzvedl neprio
+//E: vyzvednuti_tl1_np, vyzvednuti_tl1_p
+
+// /       tl1_np        /        tge1_np         /  (is p can pick)
+//   (is np can pick)            (set p)          /        tl1_p         /         tge1_p       /
