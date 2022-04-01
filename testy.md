@@ -98,7 +98,9 @@ cart_weight_limit.3 -> (cart_slots.2 or cart_slots.1)
 ### Kombinace dvojic bloků
 
 Tabulka byla vygenerována pomící nástroje přístupného na stránce http://combine.testos.org  
-Konfigurace pro generování lze nalézt v `combine.json`.
+Konfigurace pro generování lze nalézt v `combine.json`.  
+Pro některé kombinace se neuplatnily omezení viz **ID:** `23` (je stejná src a dst stanice)  
+A vyskytla se i duplikace předchozí kombinace viz **ID:** `17` (duplikace ID: `16`)  
 
 | **ID** | **cargo_src** | **cargo_dst** | **cart_slots** | **cargo_weight** | **cart_weight_limit** | **mult_req** |
 | :----: | :-----------: | :-----------: | :------------: | :--------------: | :-------------------: | :----------: |
@@ -162,12 +164,10 @@ Konfigurace pro generování lze nalézt v `combine.json`.
 | test_combine_14 |   14   |
 | test_combine_15 |   15   |
 | test_combine_16 |   16   |
-| test_combine_17 |   17   |
 | test_combine_18 |   18   |
 | test_combine_19 |   19   |
 | test_combine_20 |   20   |
 | test_combine_21 |   21   |
 | test_combine_22 |   22   |
-| test_combine_23 |   23   |
 | test_combine_24 |   24   |
 

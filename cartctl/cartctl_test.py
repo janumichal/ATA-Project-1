@@ -32,6 +32,10 @@ def log_on_unload(c: Cart, cargo_req: CargoReq):
     log('%d: Cart at %s: unloading: %s' % (Jarvis.time(), c.pos, cargo_req))
     log(c)
 
+def req_status_check(test ,ctl: CartCtl, stat: Status_ctl):
+    "Scheduler task to check status of request"
+    test.assertEqual(ctl.status, stat)
+
 class TestCartRequests(unittest.TestCase):
 
     def setUp(self):
@@ -162,10 +166,6 @@ class TestCartRequests(unittest.TestCase):
     def test_ceg_02(self):
         "Test [2] of CEG table: One non-priority request loaded"
 
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
-
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
             c.request(cargo_req)
@@ -210,7 +210,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl,Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl,Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -221,10 +221,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_ceg_03(self):
         "Test [3] of CEG table: One priority request loaded"
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -277,7 +273,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(110, req_status_check, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(110, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         Jarvis.run()
 
         log(cart)
@@ -287,10 +283,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_ceg_04(self):
         "Test [4] of CEG table: Cart didn't arrive in time"
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -323,7 +315,7 @@ class TestCartRequests(unittest.TestCase):
         item_01.onload = on_load
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(110, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(110, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -333,10 +325,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_ceg_05(self):
         "Test [5] of CEG table: non-priority request but no space on cart"
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -354,7 +342,7 @@ class TestCartRequests(unittest.TestCase):
         item_01 = CargoReq('B', 'C', 60, "item_01")
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Idle))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Idle))
         
         Jarvis.run()
 
@@ -366,10 +354,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_ceg_06(self):
         "Test [6] of CEG table: non-priority request with empty slots but loaded over limit."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -421,8 +405,8 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(11, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check, (cart_ctl,))
-        Jarvis.plan(50, req_status_check, (cart_ctl,))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl,))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl,))
         
         Jarvis.run()
 
@@ -434,10 +418,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_ceg_07(self):
         "Test [7] of CEG table: non-priority request with full slots but not loaded to it's limit."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -489,8 +469,8 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(11, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
-        Jarvis.plan(50, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -503,10 +483,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_combine_01(self):
         "Test 1 of combine table."
-
-        def req_status_check_norm(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -545,7 +521,7 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check_norm, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -557,10 +533,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_combine_02(self):
         "Test 2 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -595,7 +567,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -606,10 +578,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_03(self):
         "Test 3 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -648,7 +616,7 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -659,10 +627,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_combine_04(self):
         "Test 4 of combine table."
-
-        def req_status_check_norm(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -705,8 +669,8 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check_norm, (cart_ctl, Status_ctl.Normal))
-        Jarvis.plan(90, req_status_check_norm, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(90, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 
@@ -718,10 +682,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_combine_05(self):
         "Test 5 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -756,7 +716,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -767,10 +727,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_06(self):
         "Test 6 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -805,7 +761,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -816,10 +772,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_07(self):
         "Test 7 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -857,7 +809,7 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(11, add_load, (cart_ctl,item_02))
-        Jarvis.plan(55, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(55, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -868,10 +820,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_08(self):
         "Test 8 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -906,7 +854,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(35, req_status_check, (cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
         Jarvis.run()
 
@@ -918,9 +866,6 @@ class TestCartRequests(unittest.TestCase):
     def test_combine_09(self):
         "Test 9 of combine table."
 
-        def req_status_check_norm(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -963,8 +908,8 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check_norm, (cart_ctl, Status_ctl.Normal))
-        Jarvis.plan(130, req_status_check_norm, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(130, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 
@@ -976,10 +921,6 @@ class TestCartRequests(unittest.TestCase):
 
     def test_combine_10(self):
         "Test 10 of combine table."
-
-        def req_status_check(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -1014,7 +955,7 @@ class TestCartRequests(unittest.TestCase):
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
-        Jarvis.plan(80, req_status_check, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(80, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 
@@ -1025,10 +966,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_11(self):
         "Test 11 of combine table."
-
-        def req_status_check_norm(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -1071,8 +1008,8 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(70, req_status_check_norm, (cart_ctl, Status_ctl.Normal))
-        Jarvis.plan(80, req_status_check_norm, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(70, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(80, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 
@@ -1084,10 +1021,6 @@ class TestCartRequests(unittest.TestCase):
         
     def test_combine_12(self):
         "Test 12 of combine table."
-
-        def req_status_check_norm(ctl: CartCtl, stat: Status_ctl):
-            "Scheduler task to check status of request"
-            self.assertEqual(ctl.status, stat)
 
         def add_load(c: CartCtl, cargo_req: CargoReq):
             log_add_load(cargo_req)
@@ -1126,7 +1059,7 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(75, req_status_check_norm, (cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(75, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 
@@ -1136,31 +1069,507 @@ class TestCartRequests(unittest.TestCase):
         self.assertEqual(item_02.context, None)
         self.assertEqual(cart_ctl.status, Status_ctl.Idle)
 
+    def test_combine_13(self):
+        "Test 13 of combine table."
 
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'B')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'C')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 150, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('B', 'C', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('B', 'C', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_13(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
-    # def test_combine_14(self):
+    def test_combine_14(self):
+        "Test 14 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'A')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            self.assertEqual(cargo_req.content, "item_01")
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'D')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 150, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('A', 'D', 80, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_15(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
-    # def test_combine_16(self):
+    def test_combine_15(self):
+        "Test 15 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'B')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'A')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 50, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('B', 'A', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('B', 'A', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_17(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
+
+    def test_combine_16(self):
+        "Test 16 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'A')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'B')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 50, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('A', 'B', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('A', 'B', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_18(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
+
+    def test_combine_18(self):
+        "Test 18 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'D')
+            if(Jarvis.time() < cargo_req.born + 60):
+                self.assertFalse(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            else:
+                self.assertTrue(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 120)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'A')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 50, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('D', 'A', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('D', 'A', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(75, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
-    # def test_combine_19(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
-    # def test_combine_20(self):
+    def test_combine_19(self):
+        "Test 19 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'C')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'A')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(4, 50, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('C', 'A', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('C', 'A', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(65, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_21(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
-    # def test_combine_22(self):
+    def test_combine_20(self):
+        "Test 20 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'B')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            self.assertEqual(cargo_req.content, "item_01")
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'A')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(1, 500, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('B', 'A', 400, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         
-    # def test_combine_23(self):
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
-    # def test_combine_24(self):
+    def test_combine_21(self):
+        "Test 21 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'A')
+            if(Jarvis.time() < cargo_req.born + 60):
+                self.assertFalse(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            else:
+                self.assertTrue(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 120)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'C')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(1, 500, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('A', 'C', 200, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('A', 'C', 200, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(90, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
+        
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
+        
+    def test_combine_22(self):
+        "Test 22 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'A')
+            self.assertFalse(c.any_prio_cargo())
+            self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'B')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(1, 500, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('A', 'B', 200, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('A', 'B', 200, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(45, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
+        
+    def test_combine_24(self):
+        "Test 24 of combine table."
+
+        def add_load(c: CartCtl, cargo_req: CargoReq):
+            log_add_load(cargo_req)
+            c.request(cargo_req)
+
+        def on_move(c: Cart):
+            log_on_move(c)
+            self.assertEqual(c.status, Status_cart.Moving)
+
+        def on_load(c: Cart, cargo_req: CargoReq):
+            log_on_load(c, cargo_req)
+            self.assertFalse(c.empty())
+            self.assertEqual(c.pos, 'A')
+            if(Jarvis.time() < cargo_req.born + 60):
+                self.assertFalse(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 60)
+            else:
+                self.assertTrue(c.any_prio_cargo())
+                self.assertLess(Jarvis.time(), cargo_req.born + 120)
+            cargo_req.context = "loaded"
+
+        def on_unload(c: Cart, cargo_req: CargoReq):
+            log_on_unload(c, cargo_req)
+            self.assertEqual(c.pos, 'D')
+            cargo_req.context = "unloaded"
+
+        cart = Cart(1, 50, 0)
+        cart.onmove = on_move
+
+        cart_ctl = CartCtl(cart, Jarvis)
+
+        item_01 = CargoReq('A', 'D', 15, "item_01")
+        item_01.onload = on_load
+        item_01.onunload = on_unload
+
+        item_02 = CargoReq('A', 'D', 15, "item_02")
+        item_02.onload = on_load
+        item_02.onunload = on_unload
+
+
+        Jarvis.plan(10, add_load, (cart_ctl,item_01))
+        Jarvis.plan(15, add_load, (cart_ctl,item_02))
+        Jarvis.plan(90, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
+        
+        Jarvis.run()
+
+        log(cart)
+        self.assertTrue(cart.empty())
+        self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
+        self.assertEqual(cart_ctl.status, Status_ctl.Idle)
 
 
 if __name__ == "__main__":
