@@ -4,9 +4,7 @@ Example of usage/test of Cart controller implementation.
 Extended by custom tests by CEG and combine
 """
 
-from os import sched_get_priority_max
 from platform import java_ver
-import sys
 from cartctl import CartCtl, Status as Status_ctl
 from cart import Cart, CargoReq, Status as Status_cart
 from jarvisenv import Jarvis
@@ -365,49 +363,45 @@ class TestCartRequests(unittest.TestCase):
         def on_load(c: Cart, cargo_req: CargoReq):
             log_on_load(c, cargo_req)
             self.assertFalse(c.empty())
-            self.assertFalse(c.any_prio_cargo())
-            self.assertEqual(c.pos, 'B')
-            self.assertLess(Jarvis.time(), cargo_req.born + 60)
-            if(Jarvis.time() < 25):
+            if(Jarvis.time() < 15):
+                self.assertFalse(c.any_prio_cargo())
                 self.assertEqual(cargo_req.content, "item_01")
+                self.assertLess(Jarvis.time(), cargo_req.born + 60)
             else:
+                self.assertTrue(c.any_prio_cargo())
                 self.assertEqual(cargo_req.content, "item_02")
+                self.assertLess(Jarvis.time(), cargo_req.born + 120)
             cargo_req.context = "loaded"
 
         def on_unload(c: Cart, cargo_req: CargoReq):
             log_on_unload(c, cargo_req)
-            if(Jarvis.time() < 40):
+            if(Jarvis.time() < 80):
                 self.assertEqual(cargo_req.content, "item_01")
             else:
                 self.assertEqual(cargo_req.content, "item_02")
-            self.assertEqual(c.pos, 'C')
+            self.assertEqual(c.pos, 'D')
             cargo_req.context = "unloaded"
-
-        Jarvis.TRACKS = factory.Tracks([
-        factory.Track('A', 'B', 10),
-        factory.Track('B', 'C', 10),
-        factory.Track('C', 'A', 10)
-        ])
 
         cart = Cart(2, 50, 0)
         cart.onmove = on_move
 
         cart_ctl = CartCtl(cart, Jarvis)
 
-        item_01 = CargoReq('B', 'C', 40, "item_01")
+        item_01 = CargoReq('A', 'D', 50, "item_01")
         item_01.onload = on_load
         item_01.onunload = on_unload
 
-        item_02 = CargoReq('B', 'C', 20, "item_02")
+        item_02 = CargoReq('C', 'D', 10, "item_02")
         item_02.onload = on_load
         item_02.onunload = on_unload
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(11, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check, (self, cart_ctl,))
-        Jarvis.plan(50, req_status_check, (self, cart_ctl,))
+        Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(130, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
+
         Jarvis.run()
 
         log(cart)
@@ -429,49 +423,45 @@ class TestCartRequests(unittest.TestCase):
         def on_load(c: Cart, cargo_req: CargoReq):
             log_on_load(c, cargo_req)
             self.assertFalse(c.empty())
-            self.assertFalse(c.any_prio_cargo())
-            self.assertEqual(c.pos, 'B')
-            self.assertLess(Jarvis.time(), cargo_req.born + 60)
-            if(Jarvis.time() < 25):
+            if(Jarvis.time() < 15):
+                self.assertFalse(c.any_prio_cargo())
                 self.assertEqual(cargo_req.content, "item_01")
+                self.assertLess(Jarvis.time(), cargo_req.born + 60)
             else:
+                self.assertTrue(c.any_prio_cargo())
                 self.assertEqual(cargo_req.content, "item_02")
+                self.assertLess(Jarvis.time(), cargo_req.born + 120)
             cargo_req.context = "loaded"
 
         def on_unload(c: Cart, cargo_req: CargoReq):
             log_on_unload(c, cargo_req)
-            if(Jarvis.time() < 40):
+            if(Jarvis.time() < 80):
                 self.assertEqual(cargo_req.content, "item_01")
             else:
                 self.assertEqual(cargo_req.content, "item_02")
-            self.assertEqual(c.pos, 'C')
+            self.assertEqual(c.pos, 'D')
             cargo_req.context = "unloaded"
-
-        Jarvis.TRACKS = factory.Tracks([
-        factory.Track('A', 'B', 10),
-        factory.Track('B', 'C', 10),
-        factory.Track('C', 'A', 10)
-        ])
 
         cart = Cart(1, 50, 0)
         cart.onmove = on_move
 
         cart_ctl = CartCtl(cart, Jarvis)
 
-        item_01 = CargoReq('B', 'C', 10, "item_01")
+        item_01 = CargoReq('A', 'D', 10, "item_01")
         item_01.onload = on_load
         item_01.onunload = on_unload
 
-        item_02 = CargoReq('B', 'C', 10, "item_02")
+        item_02 = CargoReq('C', 'D', 10, "item_02")
         item_02.onload = on_load
         item_02.onunload = on_unload
 
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(11, add_load, (cart_ctl,item_02))
-        Jarvis.plan(35, req_status_check, (self, cart_ctl, Status_ctl.Normal))
         Jarvis.plan(50, req_status_check, (self, cart_ctl, Status_ctl.Normal))
+        Jarvis.plan(130, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
+
         Jarvis.run()
 
         log(cart)
@@ -816,6 +806,7 @@ class TestCartRequests(unittest.TestCase):
         log(cart)
         self.assertTrue(cart.empty())
         self.assertEqual(item_01.context, "unloaded")
+        self.assertEqual(item_02.context, "unloaded")
         self.assertEqual(cart_ctl.status, Status_ctl.Idle)
         
     def test_combine_08(self):
@@ -1034,7 +1025,11 @@ class TestCartRequests(unittest.TestCase):
             log_on_load(c, cargo_req)
             self.assertFalse(c.empty())
             self.assertEqual(c.pos, 'D')
-            self.assertTrue(c.any_prio_cargo())
+            if(cargo_req.content == "item_02"):
+                self.assertFalse(c.any_prio_cargo())
+            else:
+                self.assertTrue(c.any_prio_cargo())
+                
             self.assertLess(Jarvis.time(), cargo_req.born + 120)
             cargo_req.context = "loaded"
 
@@ -1059,7 +1054,7 @@ class TestCartRequests(unittest.TestCase):
 
         Jarvis.plan(10, add_load, (cart_ctl,item_01))
         Jarvis.plan(15, add_load, (cart_ctl,item_02))
-        Jarvis.plan(75, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
+        Jarvis.plan(80, req_status_check, (self, cart_ctl, Status_ctl.UnloadOnly))
         
         Jarvis.run()
 

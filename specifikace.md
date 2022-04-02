@@ -4,7 +4,7 @@ Pokud je požadováno přemístění nákladu z jednoho místa do druhého, voz�
  - UNSPECIFIED_SUBJECT, "Místo" je příliš obecné (místo -> stanice). 
  - OMISSION, Chybí důsledek, co se stane když si vozík vyzvedne náklad od 1 minuty?
  - RANDOM_STATEMENT, Kde si vozík materiál vyzvedne? (2 místa kam může jet)
- - IMPLICIT, Specifikovat že "požadavek" mí specifický účel.
+ - IMPLICIT, Specifikovat že "požadavek" má specifický účel (požadavek na něco).
  - AMB_TEMPORAL, Od čeho se začne počítat 1 minuta.
 
 *Pokud dojde k přijetí požadavku vozíkem na přemístění nákladu ze zdrojové nakládací stanice do cílové nakládací stanice a vozík si tento náklad vyzvedne z počáteční stanice do 1 minuty od přijetí požadavku, tak dojde k naložení nákladu na vozík.*
@@ -34,7 +34,7 @@ Pokud vozík nakládá prioritní materiál, přepíná se do režimu pouze-vykl
  - AMB_SUBJECT, Opět, je prioritní materiál to stejné jako materiál s prioritním požadavkem pro vyzvednutí?
  - AMB_STATEMENT, Má řežim "pouze-vykládka" jenom když nakládá ? co když skončí? 
 
-*Pokud vozík nakládá náklad s prioritním vyřízením požadavku pro vyzvednutí, tak se přepne do režimu pouze-vykládka, jinak se vozík nepřepne do režimu pouze-vykládka*
+*Pokud vozík nakloží náklad s prioritním vyřízením požadavku pro vyzvednutí, tak se přepne do režimu pouze-vykládka, jinak se vozík nepřepne do režimu pouze-vykládka.*
 
 V tomto režimu zustává, dokud nevyloží všechen takový materiál.
 

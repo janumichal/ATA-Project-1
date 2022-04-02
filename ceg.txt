@@ -3,8 +3,8 @@ Causes:
 // Časová pásma
 tl1_np:     Časové pásmo: Vyzvednutí trvá < 1m od přijetí NEprioritního požadavku. (time < 1m)
 tge1_np:    Časové pásmo: Vyzvednutí trvá >= 1m od přijetí NEprioritního požadavku. (time >= 1m)
-tl1_p:      Časové pásmo:  Vyzvednutí trvá < 1m od přijetí prioritního požadavku (time < 1m)
-tge1_p:     Časové pásmo: Vyzvednutí trvá >= 1m od přijetí prioritního požadavku. (time >= 1m)
+tl1_p:      Časové pásmo:  Vyzvednutí trvá < 1m od přijetí prioritního požadavku (1m < time < 2m)
+tge1_p:     Časové pásmo: Vyzvednutí trvá >= 1m od přijetí prioritního požadavku. (time >= 2m)
 
 // akce ve zvoleném pásmu
 vyzvednuti_tl1_np:  Vyzvednutí nákladu v pásmu tl1_np.
@@ -22,7 +22,7 @@ Effects:
 e_nalozeni_np:          Naložení neprioritního nákladu na vozík.
 e_nalozeni_p:           Naložení prioritního nákladu na vozík.
 e_set_priority_req:     Je nastaven prioritní požadavek.
-e_delreq_infomsg:       Odstranění prio požadavku a odeslání info zprávy o překrožení času
+e_delreq:               Odstranění prio požadavku
 e_set_unload_only:      Přepnutí do režimu pouze vykládka pokud naloží prioritní náklad
 e_still_unload_only:    Zůstává v režimu pouze vykládka dokud nevyloží veškerý prioritní náklad.
 e_only_to_prio_dest:    Vozík je v režimu pouze vykládka a jede jenom do cíle daným prioritním nákladem.
@@ -32,7 +32,7 @@ has_space = has_empty_slot && not_loaded_overlimit
 e_nalozeni_np = vyzvednuti_tl1_np && has_space 
 e_set_priority_req = tge1_np 
 e_nalozeni_p = vyzvednuti_tl1_p && has_space 
-e_delreq_infomsg = tge1_p
+e_delreq = tge1_p
 e_set_unload_only = has_prio_load
 e_still_unload_only = has_prio_load && set_unload_only      // musí být před tím v režimu pouze vykládka
 e_only_to_prio_dest = set_unload_only

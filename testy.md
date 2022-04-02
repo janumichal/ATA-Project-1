@@ -7,6 +7,9 @@ Graf lze nalézt ve složce jako `ceg.png` nebo `ceg.svg`
 ![CEG](ceg.svg)
 
 ### Výsledná rozhodovací tabulka
+
+Vybrané kombinace pro pokrytí testy
+
 |         **Name**         |                                   **Description**                                    | **[1]** | **[2]** | **[3]** | **[4]** | **[5]** | **[6]** | **[7]** |
 | :----------------------: | :----------------------------------------------------------------------------------: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: | :-----: |
 |        **tl1_np**        |  Časové pásmo: Vyzvednutí trvá < 1m od přijetí NEprioritního požadavku. (time < 1m)  |    0    |    1    |    1    |    1    |    1    |    1    |    1    |
@@ -30,6 +33,9 @@ Graf lze nalézt ve složce jako `ceg.png` nebo `ceg.svg`
 | **e_only_to_prio_dest**  |   Vozík je v režimu pouze vykládka a jede jenom do cíle daným prioritním nákladem.   |  False  |  False  |  True   |  False  |  False  |  False  |  False  |
 
 ## 2. Identifikace vstupních parametrů
+
+Vstupních parametrů je více než je vypsáno v tabulce. V tabulce byly vypsány vstupní paramtery využity pro mé testy.  
+
 |       **Název**       |                     **Stručný popis**                     |
 | :-------------------: | :-------------------------------------------------------: |
 |     **cargo_src**     |                 Zdrojová stanice nákladu.                 |
@@ -99,8 +105,7 @@ cart_weight_limit.3 -> (cart_slots.2 or cart_slots.1)
 
 Tabulka byla vygenerována pomící nástroje přístupného na stránce http://combine.testos.org  
 Konfigurace pro generování lze nalézt v `combine.json`.  
-Pro některé kombinace se neuplatnily omezení viz **ID:** `23` (je stejná src a dst stanice)  
-A vyskytla se i duplikace předchozí kombinace viz **ID:** `17` (duplikace ID: `16`)  
+
 
 | **ID** | **cargo_src** | **cargo_dst** | **cart_slots** | **cargo_weight** | **cart_weight_limit** | **mult_req** |
 | :----: | :-----------: | :-----------: | :------------: | :--------------: | :-------------------: | :----------: |
@@ -145,6 +150,9 @@ A vyskytla se i duplikace předchozí kombinace viz **ID:** `17` (duplikace ID: 
 |   test_ceg_07   |  [7]   |
 
 #### Pokrytí tabulky kombinace dvojic bloků
+
+Pro některé kombinace se neuplatnily omezení viz **ID:** `23` (je stejná src a dst stanice)  
+A vyskytla se i duplikace předchozí kombinace viz **ID:** `17` (duplikace ID: `16`)  
 
 | **Název testu** | **ID** |
 | :-------------: | :----: |
